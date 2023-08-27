@@ -1,0 +1,22 @@
+{
+  "executionEnvironments": [
+    {
+      "root": "./",
+      "pythonVersion": "3.11",
+    }
+  ],
+  "include": [
+    "src"
+  ],
+  "exclude": [
+    "./venv"
+  ],
+  "defineConstant": {
+    "DEBUG": true
+  },
+  "venvPath": "./venv/",
+  "venv": "./venv/",
+  "analysis": {
+    "autoImportCompletions": true
+  }
+}
