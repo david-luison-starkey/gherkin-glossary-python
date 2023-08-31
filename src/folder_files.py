@@ -4,7 +4,7 @@ import json
 from dataclasses import asdict, dataclass
 from itertools import chain
 from pathlib import Path
-from typing import Any
+from typing import Any, Iterator
 
 
 @dataclass
@@ -19,7 +19,7 @@ class FolderFiles:
     files: list[FileContent]
     children: list[FolderFiles]
 
-    def __iter__(self):
+    def __iter__(self) -> Iterator[Any]:
         """
         Iterate over properties and values as dictionary key value pairs
         """
