@@ -1,0 +1,21 @@
+{
+  "type": "array",
+  "items": {
+    "type": "object",
+    "properties": {
+      "custom_type": {
+        "type": "string"
+      },
+      "valid_values": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        }
+      }
+    },
+    "required": [
+      "custom_type",
+      "valid_values"
+    ]
+  }
+}

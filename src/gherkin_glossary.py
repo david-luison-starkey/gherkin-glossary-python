@@ -1,35 +1,34 @@
 from __future__ import annotations
 
+import json
 import re
-from dataclasses import dataclass
 from itertools import chain
+from pathlib import Path
+from typing import Any, Optional
 
-from gherkin_keywords import GherkinKeywords
-
-
-@dataclass
-class GherkinCustomTypes:
-    custom_type: str
-    type_values: list[str]
+from src.gherkin_custom_types import GherkinCustomTypes
+from src.gherkin_keywords import GherkinKeywords
 
 
 class GherkinTermGlossary:
+    _RELEVANT_PROPERTY_SUBSET = ["given", "when", "then", "tags", "comments"]
+
     def __init__(
         self,
         gherkin_statements: list[str],
-        custom_types: list[GherkinCustomTypes] | None,
+        custom_types: Optional[list[GherkinCustomTypes]],
     ):
-        self.gherkin_statements = self.replace_conjunctions_with_keyword(
+        self.gherkin_statements = self._replace_conjunctions_with_keyword(
             gherkin_statements
         )
         self.custom_types = custom_types
-        self.given = self.get_gherkin_terms(GherkinKeywords.GIVEN)
-        self.when = self.get_gherkin_terms(GherkinKeywords.WHEN)
-        self.then = self.get_gherkin_terms(GherkinKeywords.THEN)
-        self.tags = self.get_tags()
-        self.comments = self.get_comments()
+        self.given = self._get_gherkin_terms(GherkinKeywords.GIVEN)
+        self.when = self._get_gherkin_terms(GherkinKeywords.WHEN)
+        self.then = self._get_gherkin_terms(GherkinKeywords.THEN)
+        self.tags = self._get_tags()
+        self.comments = self._get_comments()
 
-    def replace_conjunctions_with_keyword(
+    def _replace_conjunctions_with_keyword(
         self, gherkin_statements: list[str]
     ) -> list[str]:
         """
@@ -90,7 +89,7 @@ class GherkinTermGlossary:
         # Retrieve first word in statement, which is a keyword in gherkin syntax
         return gherkin_statement.split()[0]
 
-    def get_gherkin_terms(self, keyword: GherkinKeywords) -> set[str]:
+    def _get_gherkin_terms(self, keyword: GherkinKeywords) -> set[str]:
         """
         Returns a set of gherkin terms associated with the Gherkin keyword argument.
 
@@ -123,7 +122,7 @@ class GherkinTermGlossary:
         types_replaced = gherkin_statement
         if self.custom_types:
             for custom_type in self.custom_types:
-                for type_value in custom_type.type_values:
+                for type_value in custom_type.valid_values:
                     types_replaced = re.sub(
                         f"{type_value}",
                         f" {{{custom_type.custom_type}}} ",
@@ -131,7 +130,7 @@ class GherkinTermGlossary:
                     )
         return re.sub(r"[\s]{2,}", " ", types_replaced).rstrip()
 
-    def get_tags(self) -> set[str]:
+    def _get_tags(self) -> set[str]:
         """
         Returns set of tags (ignored commented out tags)
         """
@@ -142,10 +141,30 @@ class GherkinTermGlossary:
             )
         )
 
-    def get_comments(self) -> set[str]:
+    def _get_comments(self) -> set[str]:
         """
         Returns statements prepended with '#'
         """
         return {
             comment for comment in self.gherkin_statements if comment.startswith("#")
         }
+
+    def _get_serialised_subset(self) -> dict[str, Any]:
+        return {prop: getattr(self, prop) for prop in self._RELEVANT_PROPERTY_SUBSET}
+
+    def dump(self, output_path: Path, indent: int = 2) -> None:
+        """
+        Creates json file from `GherkinTermGlossary`
+        """
+        json.dump(
+            self._get_serialised_subset(),
+            open(output_path, "w"),
+            default=serialise_sets,
+            indent=indent,
+        )
+
+
+def serialise_sets(obj: Any) -> Any:
+    if isinstance(obj, set):
+        return list(obj)
+    return obj
