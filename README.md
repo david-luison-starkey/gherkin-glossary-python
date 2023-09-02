@@ -7,11 +7,7 @@
     </h4>
 </div>
 
----
-
 [![License: MIT](https://img.shields.io/badge/License-MIT-orange.svg)](https://github.com/david-luison-starkey/bash-annotations/blob/main/LICENSE)
-
----
 
 ## Introduction
 
