@@ -53,9 +53,8 @@ class GherkinTermGlossary:
 
         statements_list = gherkin_statements.copy()
         current_statement = statements_list[current_index]
-        conjunctions = GherkinKeywords.conjunctions()
 
-        if current_statement.startswith(conjunctions):
+        if current_statement.startswith(GherkinKeywords.conjunctions()):
             conjunction_to_replace = GherkinKeywords(
                 self._get_gherkin_keyword_from_statement(current_statement)
             )

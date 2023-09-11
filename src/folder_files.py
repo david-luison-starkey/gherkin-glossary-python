@@ -27,7 +27,7 @@ class FolderFiles:
 
     @classmethod
     def populate(
-        cls, parent_directory_path: Path, include_file_types: tuple[str]
+        cls, parent_directory_path: Path, include_file_types: tuple[str, ...]
     ) -> FolderFiles:
         """
         Create `FolderFiles` representation of a directory structure, the files in each
